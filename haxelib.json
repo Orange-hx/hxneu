@@ -1,0 +1,12 @@
+{
+    "name"         : "hxneu",
+    "url"          : "https://github.com/Orange-hx/hxneu",
+    "license"      : "Public",
+    "tags"         : [ "neutralinojs", "neutralino", "js", "web", "native" ],
+    "description"  : "Haxe externs for Neutralino.js!",
+    "version"      : "1.0.0",
+    "releasenote"  : "Neutralino.js externs added for Orange.hx stuff!",
+    "classPath"    : "src",
+    "contributors" : [ "Rabios" ],
+    "dependencies" : {}
+}
