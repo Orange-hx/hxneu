@@ -1,11 +1,14 @@
 package;
 
+import haxe.Int64;
 import haxe.extern.EitherType;
 
 #if (haxe_ver < 4)
 import js.Promise;
+import js.html.ArrayBuffer;
 #else
 import js.lib.Promise;
+import js.lib.ArrayBuffer;
 #end
 
 @:native("window")
@@ -21,6 +24,7 @@ extern class NeutralinoGlobal {
     public static var NL_TEST(default, null): String;
     public static var NL_TOKEN(default, null): String;
     public static var NL_VERSION(default, null): String;
+    public static var NL_PID(default, null): String;
 }
 
 typedef OpenActionOptions = {
@@ -47,6 +51,34 @@ typedef NeutralinoWindowConfig = {
     var ?maximize: Bool;
     var ?resizable: Bool;
     var ?hidden: Bool;
+}
+
+typedef WindowSizeOptions = {
+    var ?width: Int;
+    var ?height: Int;
+    var ?minWidth: Int;
+    var ?minHeight: Int;
+    var ?maxWidth: Int;
+    var ?maxHeight: Int;
+    var ?resizable: Bool;
+}
+
+typedef WindowOptions = {
+    var ?title: String;
+    var ?icon: String;
+    var ?fullScreen: Bool;
+    var ?alwaysOnTop: Bool;
+    var ?enableInspector: Bool;
+    var ?borderless: Bool;
+    var ?maximize: Bool;
+    var ?hidden: Bool;
+    var ?maximizable: Bool;
+    var ?processArgs: Array<String>;
+}
+
+typedef WindowConfig = {
+    var ?url: String;
+    var ?options: WindowOptions;
 }
 
 typedef NeutralinoCLIConfig = {
@@ -83,18 +115,45 @@ typedef NeutralinoConfigResult = {
 extern class NeutralinoApp {
     public var __esModule(default, null): Bool;
     public function exit(): Promise<NeutralinoResult>;
+    public function killProcess(): Promise<NeutralinoResult>;
     public function keepAlive(): Promise<NeutralinoResult>;
     public function getConfig(): Promise<NeutralinoConfigResult>;
     public function open(options: OpenActionOptions): Promise<NeutralinoResult>;
+}
+
+extern class NeutralinoWindow {
+    public var __esModule(default, null): Bool;
+    public function setTitle(title: String): Promise<NeutralinoResult>;
+    public function minimize(): Promise<NeutralinoResult>;
+    public function maximize(): Promise<NeutralinoResult>;
+    public function isMaximized(): Bool;
+    public function setFullScreen(): Promise<NeutralinoResult>;
+    public function exitFullScreen(): Promise<NeutralinoResult>;
+    public function isFullScreen(): Bool;
+    public function show(): Promise<NeutralinoResult>;
+    public function hide(): Promise<NeutralinoResult>;
+    public function isVisible(): Bool;
+    public function focus(): Promise<NeutralinoResult>;
+    public function move(x: Int, y: Int): Promise<NeutralinoResult>;
+    public function setIcon(icon: String): Promise<NeutralinoResult>;
+    public function setDraggableRegion(domId: String): Promise<NeutralinoResult>;
+    public function setSize(options: WindowSizeOptions): Promise<NeutralinoResult>;
 }
 
 typedef PathOptions = {
     var ?path: String;
 }
 
+typedef PathStats = {
+    var ?success: Bool;
+    var ?size: Int64;
+    var ?isFile: Bool;
+    var ?isDirectory: Bool;
+}
+
 typedef WriteFileOptions = {
     var ?fileName: String;
-    var ?data: String;
+    var ?data: EitherType<String, ArrayBuffer>;
 }
 
 typedef FileOptions = {
@@ -102,7 +161,7 @@ typedef FileOptions = {
 }
 
 typedef FileReadResult = {
-    var ?data: String;
+    var ?data: EitherType<String, ArrayBuffer>;
     var ?success: Bool;
 }
 
@@ -120,14 +179,24 @@ typedef ReadDirectoryResult = {
     var ?entries: Array<FileEntry>;
 }
 
+typedef FileOperationOptions = {
+    var ?source: String;
+    var ?destination: String;
+}
+
 extern class NeutralinoFS {
     public var __esModule(default, null): Bool;
     public function createDirectory(options: PathOptions): Promise<NeutralinoResult>;
     public function removeDirectory(options: PathOptions): Promise<NeutralinoResult>;
     public function writeFile(options: WriteFileOptions): Promise<NeutralinoResult>;
+    public function writeBinaryFile(options: WriteFileOptions): Promise<NeutralinoResult>;
     public function readFile(options: FileOptions): Promise<FileReadResult>;
+    public function readBinaryFile(options: FileOptions): Promise<FileReadResult>;
     public function removeFile(options: FileOptions): Promise<NeutralinoResult>;
     public function readDirectory(options: PathOptions): Promise<ReadDirectoryResult>;
+    public function copyFile(options: FileOperationOptions): Promise<NeutralinoResult>;
+    public function moveFile(options: FileOperationOptions): Promise<NeutralinoResult>;
+    public function getStats(options: PathOptions): Promise<PathStats>;
 }
 
 typedef ExecCommandOptions = {
@@ -270,14 +339,22 @@ extern class NeutralinoDebug {
     public function log(message: NeutralinoLogMessage): Promise<NeutralinoLogResult>;
 }
 
+extern class NeutralinoEvents {
+    public var __esModule(default, null): Bool;
+    public function on(eventName: String, handler: haxe.Constraints.Function): Promise<NeutralinoResult>;
+    public function off(eventName: String, handler: haxe.Constraints.Function): Promise<NeutralinoResult>;
+    public function dispatch(eventName: String, data: Dynamic): Promise<NeutralinoResult>;
+}
+
 @:native("Neutralino")
 extern class Neutralino {
     public static var __esModule(default, null): Bool;
     public static var app(default, null): NeutralinoApp;
+    public static var window(default, null): NeutralinoWindow;
     public static var filesystem(default, null): NeutralinoFS;
     public static var os(default, null): NeutralinoOS;
     public static var computer(default, null): NeutralinoComputer;
     public static var storage(default, null): NeutralinoStorage;
     public static var debug(default, null): NeutralinoDebug;
-    public static var events(default, null): Dynamic;
+    public static var events(default, null): NeutralinoEvents;
 }
