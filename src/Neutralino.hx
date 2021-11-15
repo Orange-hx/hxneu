@@ -157,7 +157,7 @@ typedef WriteFileOptions = {
 }
 
 typedef FileOptions = {
-    var ?filename: String;
+    var ?fileName: String;
 }
 
 typedef FileReadResult = {
